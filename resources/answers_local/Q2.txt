@@ -1,0 +1,13 @@
+Drama == 379
+Crime == 105
+Comedy == 103
+Adventure == 91
+Action == 89
+Thriller == 55
+Biography == 52
+Mystery == 48
+Animation == 40
+Fantasy == 13
+Horror == 10
+Western == 10
+Film-Noir == 9
