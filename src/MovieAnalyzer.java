@@ -2,7 +2,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.*;
 
 public class MovieAnalyzer {
     String Poster_Link;
@@ -19,12 +19,19 @@ public class MovieAnalyzer {
     String Noofvotes;// Total number of votes
     String Gross;// Money earned by that movie
 
+    public static List<MovieAnalyzer> movieAnalyzerList = new LinkedList<>();
     public MovieAnalyzer(String dataset_path) {
         String[] s = dataset_path.split(",");
         int flag = 0, index = 0;
-        String now = null;
+        String now = "";
+        if (s.length < 16) {
+            this.Gross = "NULL";
+        }
         for (String ss : s) {
-            if (ss.charAt(0) == '\"' || ss.charAt(ss.length() - 1) == '\"') {
+            if (ss == null || ss.length() == 0) {
+                now = "NULL";
+            }
+            else if (ss.charAt(0) == '\"' || ss.charAt(ss.length() - 1) == '\"') {
                 flag++;
                 flag %= 2;
             }
@@ -49,7 +56,8 @@ public class MovieAnalyzer {
                     case 15 : this.Gross = now;
                 }
                 index++;
-                now = null;
+                // System.out.println(now);
+                now = "";
             } else {
                 now += ",";
             }
@@ -57,6 +65,7 @@ public class MovieAnalyzer {
     }
 
     public static void main(String[] args) {
+
         File file = new File("D:\\study\\G3\\Java2\\Assignment\\A1_Sample\\resources\\imdb_top_500.csv");
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String tempString;
@@ -65,13 +74,26 @@ public class MovieAnalyzer {
             while ((tempString = reader.readLine()) != null) {
                 // 显示行号
                 // System.out.println("line " + line + ": " + tempString);
+                // System.out.println();
                 MovieAnalyzer movieAnalyzer = new MovieAnalyzer(tempString);
+                movieAnalyzerList.add(movieAnalyzer);
                 line++;
             }
+            int cnt = 0;
+            for (MovieAnalyzer i : movieAnalyzerList) {
+                System.out.println(i.Director);
+                cnt++;
+            }
+            System.out.println(cnt);
             reader.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    public Map<Integer, Integer> getMovieCountByYear() {
+        Map<Integer, Integer> ans = new HashMap<Integer, Integer>();
+
+        return ans;
+    }
 }
