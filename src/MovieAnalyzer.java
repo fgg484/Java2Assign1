@@ -92,16 +92,26 @@ public class MovieAnalyzer {
         }
     }
     public Map<Integer, Integer> getMovieCountByYear() {
-        int[] tong = new int[5000];
+//        int[] tong = new int[5000];
+//        for (Movie m : movies) {
+//            int year = getYear(m);
+//            tong[year]++;
+//        }
+        Map<Integer, Integer> ans = new HashMap<>();
+//        for (int i = 1850; i <= 2025; i++) {
+//            if (tong[i] != 0) {
+//                ans.put(i, tong[i]);
+//                // System.out.println(i + " " + tong[i]);
+//            }
+//        }
         for (Movie m : movies) {
             int year = getYear(m);
-            tong[year]++;
-        }
-        Map<Integer, Integer> ans = new HashMap<>();
-        for (int i = 1850; i <= 2025; i++) {
-            if (tong[i] != 0) {
-                ans.put(i, tong[i]);
-                // System.out.println(i + " " + tong[i]);
+            Integer cnt = ans.get(year);
+            if (cnt == null) {
+                ans.put(year, 1);
+            }
+            else {
+                ans.put(year, cnt + 1);
             }
         }
         //System.out.println(ans);
@@ -134,18 +144,28 @@ public class MovieAnalyzer {
     public Map<String, Integer> getMovieCountByGenre() {
         Map<String, Integer> ans = new HashMap<>();
         for (Movie m : movies) {
-            String genre = m.Genre;
-            ans.merge(genre, 1, Integer::sum);
+            String[] genres = m.Genre.split(",");
+            for (String genre : genres) {
+                genre = genre.replaceAll(" ", "");
+                genre = genre.replaceAll("\"","");
+                Integer cnt = ans.get(genre);
+                if (cnt == null) {
+                    ans.put(genre, 1);
+                } else {
+                    ans.put(genre, cnt + 1);
+                }
+            }
         }
         return ans
                 .entrySet()
                 .stream()
-                .sorted(comparingByValue())
+                .sorted(Collections.reverseOrder(comparingByValue()))
                 .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
     }
 
     public Map<List<String>, Integer> getCoStarCount() {
         Map<List<String>, Integer> ans = new HashMap<>();
+
         return ans;
     }
 
