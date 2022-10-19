@@ -84,6 +84,9 @@ public class MovieAnalyzer {
                     now += ",";
                 }
             }
+            if (this.Series_Title.charAt(0) == '\"') {
+                this.Series_Title = this.Series_Title.replaceAll("\"", "");
+            }
             if (this.Gross.charAt(0) != '\"') {
                 this.Gross = "NULL";
             }
@@ -261,7 +264,7 @@ public class MovieAnalyzer {
     public static void main(String[] args) {
         MovieAnalyzer movieAnalyzer = new MovieAnalyzer("D:\\study\\G3\\Java2\\Assignment\\A1_Sample\\resources\\imdb_top_500.csv");
         for (Movie m : movies) {
-            if (m.Series_Title.equals("Anatomy of a Murder") || m.Series_Title.equals("Dangal") || m.Series_Title.equals("\"Il buono, il brutto, il cattivo\"")) {
+            if (m.Series_Title.equals("Drishyam")) {
                 System.out.println(m.Series_Title);
 //                System.out.println(m.Released_Year);
 //                System.out.println(m.Certificate);
