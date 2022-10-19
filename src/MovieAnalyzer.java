@@ -3,6 +3,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.Map.Entry.comparingByValue;
+import static java.util.stream.Collectors.toMap;
 
 public class MovieAnalyzer {
     String Poster_Link;
@@ -19,7 +24,7 @@ public class MovieAnalyzer {
     String Noofvotes;// Total number of votes
     String Gross;// Money earned by that movie
 
-    public static List<MovieAnalyzer> movieAnalyzerList = new LinkedList<>();
+    public static List<MovieAnalyzer> movieAnalyzerList = new ArrayList<>();
     public MovieAnalyzer(String dataset_path) {
         String[] s = dataset_path.split(",");
         int flag = 0, index = 0;
@@ -79,12 +84,6 @@ public class MovieAnalyzer {
                 movieAnalyzerList.add(movieAnalyzer);
                 line++;
             }
-            int cnt = 0;
-            for (MovieAnalyzer i : movieAnalyzerList) {
-                System.out.println(i.Director);
-                cnt++;
-            }
-            System.out.println(cnt);
             reader.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -92,8 +91,41 @@ public class MovieAnalyzer {
     }
 
     public Map<Integer, Integer> getMovieCountByYear() {
+        int[] tong = new int[50000];
+        for (MovieAnalyzer m : movieAnalyzerList) {
+            int year = m.getYear();
+            tong[year]++;
+        }
         Map<Integer, Integer> ans = new HashMap<Integer, Integer>();
+        for (int i = 1900; i <= 2025; i++) {
+            if (tong[i] != 0) {
+                ans.put(i, tong[i]);
+                // System.out.println(i + " " + tong[i]);
+            }
+        }
+//        转化为list的方式
+//        List<Map.Entry<Integer, Integer>> list = new ArrayList<Map.Entry<Integer, Integer>>(ans.entrySet());
+//        list.sort(new Comparator<Map.Entry<Integer, Integer>>() {
+//          public int compare(Map.Entry<Integer, Integer> o1, Map.Entry<Integer, Integer> o2) {
+//              return o2.getValue().compareTo(o1.getValue());
+//          }
+//        });
+        ans = ans
+                .entrySet()
+                .stream()
+                .sorted(Collections.reverseOrder(comparingByValue()))
+                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
+        return ans;
+    }
 
+    private int getYear() {
+        String s = this.Released_Year;
+        int l = 3, ans = 0;
+        while (l >= 0) {
+            int pos = s.charAt(l) - '0';
+            ans += pos * Math.pow(10, 3 - l);
+            l--;
+        }
         return ans;
     }
 }
