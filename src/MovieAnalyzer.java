@@ -1,3 +1,4 @@
+import javax.lang.model.element.Element;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -24,20 +25,37 @@ public class MovieAnalyzer {
         String Star1, Star2, Star3, Star4;// Name of the Stars
         String Noofvotes;// Total number of votes
         String Gross;// Money earned by that movie
+
+        //"https://m.media-amazon.com/images/M/MV5BOTc2ZTlmYmItMDBhYS00YmMzLWI4ZjAtMTI5YTBjOTFiMGEwXkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_UY98_CR0,0,67,98_AL_.jpg",
+        // Soorarai Pottru,
+        // 2020,
+        // U,
+        // 153 min,
+        // Drama,
+        // 8.6,
+        // "Nedumaaran Rajangam ""Maara"" sets out to make the common man fly and in the process takes on the world's most capital intensive industry and several enemies who stand in his way.",
+        // ,
+        // Sudha Kongara,
+        // Suriya,
+        // Madhavan,
+        // Paresh Rawal,
+        // Aparna Balamurali,
+        // 54995,
+        //
+
         public Movie(String movie) {
             String[] s = movie.split(",");
             int flag = 0, index = 0;
             String now = "";
-            if (s.length < 16) {
-                this.Gross = "NULL";
-            }
             for (String ss : s) {
                 if (ss == null || ss.length() == 0) {
                     now = "NULL";
                 }
                 else if (ss.charAt(0) == '\"' || ss.charAt(ss.length() - 1) == '\"') {
-                    flag++;
-                    flag %= 2;
+                    if (!(ss.charAt(0) == '\"' && ss.charAt(ss.length() - 1) == '\"')) {
+                        flag++;
+                        flag %= 2;
+                    }
                 }
                 now += ss;
                 if (flag == 0) {
@@ -65,6 +83,9 @@ public class MovieAnalyzer {
                 } else {
                     now += ",";
                 }
+            }
+            if (this.Gross.charAt(0) != '\"') {
+                this.Gross = "NULL";
             }
         }
     }
@@ -127,7 +148,7 @@ public class MovieAnalyzer {
                 .entrySet()
                 .stream()
                 .sorted(Collections.reverseOrder(comparingByKey()))
-                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
+                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
     }
 
     private int getYear(Movie movie) {
@@ -136,6 +157,17 @@ public class MovieAnalyzer {
         while (l >= 0) {
             int pos = s.charAt(l) - '0';
             ans += pos * Math.pow(10, 3 - l);
+            l--;
+        }
+        return ans;
+    }
+
+    public int getRunTime(Movie m) {
+        String[] time = m.Runtime.split(" ");
+        int len = time[0].length(), ans = 0;
+        int l = len - 1;
+        while(l >= 0) {
+            ans += (time[0].charAt(l) - '0') * Math.pow(10, len - 1 - l);
             l--;
         }
         return ans;
@@ -159,8 +191,9 @@ public class MovieAnalyzer {
         return ans
                 .entrySet()
                 .stream()
+                .sorted(comparingByKey())
                 .sorted(Collections.reverseOrder(comparingByValue()))
-                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
+                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
     }
 
     public Map<List<String>, Integer> getCoStarCount() {
@@ -171,6 +204,47 @@ public class MovieAnalyzer {
 
     public List<String> getTopMovies(int top_k, String by) {
         List<String> ans = new ArrayList<>();
+        Map<String, Integer> ans_runtime = new HashMap<>();
+        Map<String, Integer> ans_overview = new HashMap<>();
+        if (by.equals("runtime")){
+            for (Movie m : movies) {
+                int run_time = getRunTime(m);
+                ans_runtime.put(m.Series_Title, run_time);
+            }
+            ans_runtime = ans_runtime
+                    .entrySet()
+                    .stream()
+                    .sorted(comparingByKey())
+                    .sorted(Collections.reverseOrder(comparingByValue()))
+                    .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
+            int cnt = 0;
+            for (String name : ans_runtime.keySet()) {
+                name = name.replaceAll("\"", "");
+                if (cnt == top_k)
+                    break;
+                ans.add(name);
+                cnt++;
+            }
+        }
+        else if (by.equals("overview")) {
+            for(Movie m : movies) {
+                ans_overview.put(m.Series_Title, m.Overview.length());
+            }
+            ans_overview = ans_overview
+                    .entrySet()
+                    .stream()
+                    .sorted(comparingByKey())
+                    .sorted(Collections.reverseOrder(comparingByValue()))
+                    .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
+            int cnt = 0;
+            for (String name : ans_overview.keySet()) {
+                name = name.replaceAll("\"", "");
+                if (cnt == top_k)
+                    break;
+                ans.add(name);
+                cnt++;
+            }
+        }
         return ans;
     }
 
@@ -187,7 +261,22 @@ public class MovieAnalyzer {
     public static void main(String[] args) {
         MovieAnalyzer movieAnalyzer = new MovieAnalyzer("D:\\study\\G3\\Java2\\Assignment\\A1_Sample\\resources\\imdb_top_500.csv");
         for (Movie m : movies) {
-            System.out.println(m.Released_Year);
+            if (m.Series_Title.equals("Anatomy of a Murder") || m.Series_Title.equals("Dangal") || m.Series_Title.equals("\"Il buono, il brutto, il cattivo\"")) {
+                System.out.println(m.Series_Title);
+//                System.out.println(m.Released_Year);
+//                System.out.println(m.Certificate);
+                System.out.println(m.Runtime);
+//                System.out.println(m.Genre);
+//                System.out.println(m.IMDB_Rating);
+//                System.out.println(m.Overview);
+//                System.out.println(m.Overview.length());
+//                System.out.println(m.Meta_score);
+//                System.out.println(m.Director);
+//                System.out.println(m.Star1 + "->" + m.Star2 + "->" + m.Star3 + "->" + m.Star4);
+//                System.out.println(m.Noofvotes);
+//                System.out.println(m.Gross);
+            }
         }
+        // System.out.println(getTopMovies(10, "runtime"));
     }
 }
