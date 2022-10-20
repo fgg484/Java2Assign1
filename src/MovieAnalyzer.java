@@ -271,23 +271,33 @@ public class MovieAnalyzer {
     public List<String> getTopStars(int top_k, String by) {
         List<String> stars = new ArrayList<>();
         if (by.equals("rating")) {
-            Map<String, List<Float>> ans = new HashMap<>();
-            Map<String, Float> real_ans = new HashMap<>();
+            Map<String, List<Double>> ans = new HashMap<>();
+            Map<String, Double> real_ans = new HashMap<>();
             for (Movie m : movies) {
                 String[] s = {m.Star1, m.Star2, m.Star3, m.Star4};
                 for (String ss : s) {
-                    List<Float> num = ans.get(ss);
+                    List<Double> num = ans.get(ss);
                     if (num == null) {
                         num = new ArrayList<>();
-                        num.add(m.getRating());
-                        num.add(1.0F);
+                        num.add((double)m.getRating());
+                        if (m.getRating() > 0) {
+                            num.add(1.0);
+                        }
+                        else {
+                            num.add(0.0);
+                        }
                         ans.put(ss, num);
-                        real_ans.put(ss, m.getRating());
+                        real_ans.put(ss, (double)m.getRating());
                     } else {
                         num.set(0, num.get(0) + m.getRating());
                         num.set(1, num.get(1) + 1);
                         ans.put(ss, num);
-                        real_ans.put(ss, num.get(0) / num.get(1));
+                        if (num.get(1) != 0) {
+                            real_ans.put(ss, (double)(num.get(0) / (double)num.get(1)));
+                        }
+                        else {
+                            real_ans.put(ss, 0.0);
+                        }
                     }
                 }
             }
@@ -309,7 +319,12 @@ public class MovieAnalyzer {
                     if (num == null) {
                         num = new ArrayList<>();
                         num.add(m.getGross());
-                        num.add(1L);
+                        if (m.getGross() > 0) {
+                            num.add(1L);
+                        }
+                        else {
+                            num.add(0L);
+                        }
                         ans.put(ss, num);
                         real_ans.put(ss, m.getGross());
                     } else {
@@ -319,7 +334,12 @@ public class MovieAnalyzer {
                         else
                             num.set(1, num.get(1) + 1);
                         ans.put(ss, num);
-                        real_ans.put(ss, num.get(0) / num.get(1));
+                        if (num.get(1) != 0) {
+                            real_ans.put(ss, num.get(0) / num.get(1));
+                        }
+                        else {
+                            real_ans.put(ss, 0L);
+                        }
                     }
                 }
             }
@@ -360,7 +380,8 @@ public class MovieAnalyzer {
         //for(String s : list) {
             //System.out.println(s);
             for (Movie m : movies) {
-                //if (m.Star1.equals(s) || m.Star2.equals(s) || m.Star3.equals(s) || m.Star4.equals(s)) {
+                String s = "Toni Collette";
+                if (m.Star1.equals(s) || m.Star2.equals(s) || m.Star3.equals(s) || m.Star4.equals(s)) {
 //                    System.out.println(m.Series_Title);
 //                    System.out.println(m.Released_Year);
 //                    System.out.println(m.Certificate);
@@ -378,6 +399,6 @@ public class MovieAnalyzer {
                     System.out.println(m.getGross());
                 }
             //}
-        //}
+        }
     }
 }
