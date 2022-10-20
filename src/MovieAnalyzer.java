@@ -90,6 +90,8 @@ public class MovieAnalyzer {
             if (this.Overview.charAt(0) == '\"') {
                 this.Overview = this.Overview.substring(1, this.Overview.length() - 1);
             }
+            this.Genre = this.Genre.replaceAll("\"", "");
+            this.Genre = this.Genre.replaceAll(" ","");
             if (this.Gross.charAt(0) != '\"') {
                 this.Gross = "NULL";
             }
@@ -334,7 +336,22 @@ public class MovieAnalyzer {
 
     public List<String> searchMovies(String genre, float min_rating, int max_runtime) {
         List<String> ans = new ArrayList<>();
-        return ans;
+        for (Movie m : movies) {
+            if (m.getRating() >= min_rating && m.getRuntime() <= max_runtime) {
+                String[] genres = m.Genre.split(",");
+                for (String s : genres) {
+                    s.replaceAll(" ","");
+                    if (s.equals(genre)) {
+                        ans.add(m.Series_Title);
+                        break;
+                    }
+                }
+            }
+        }
+        return ans
+                .stream()
+                .sorted(String::compareTo)
+                .toList();
     }
 
     public static void main(String[] args) {
