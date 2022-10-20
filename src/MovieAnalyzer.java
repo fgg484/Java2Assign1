@@ -85,14 +85,35 @@ public class MovieAnalyzer {
                 }
             }
             if (this.Series_Title.charAt(0) == '\"') {
-                this.Series_Title = this.Series_Title.replaceAll("\"", "");
+                this.Series_Title = this.Series_Title.substring(1, this.Series_Title.length() - 1);
+            }
+            if (this.Overview.charAt(0) == '\"') {
+                this.Overview = this.Overview.substring(1, this.Overview.length() - 1);
             }
             if (this.Gross.charAt(0) != '\"') {
                 this.Gross = "NULL";
             }
         }
-    }
 
+        public int getRuntime() {
+            String[] time = this.Runtime.split(" ");
+            int len = time[0].length(), ans = 0;
+            int l = len - 1;
+            while(l >= 0) {
+                ans += (time[0].charAt(l) - '0') * Math.pow(10, len - 1 - l);
+                l--;
+            }
+            return ans;
+        }
+
+        public String getSeries_Title() {
+            return this.Series_Title;
+        }
+
+        public int getLenOfOverview() {
+            return this.Overview.length();
+        }
+    }
     public static List<Movie> movies = new ArrayList<>();
     public MovieAnalyzer(String dataset_path) {
         File file = new File(dataset_path);
@@ -164,18 +185,6 @@ public class MovieAnalyzer {
         }
         return ans;
     }
-
-    public int getRunTime(Movie m) {
-        String[] time = m.Runtime.split(" ");
-        int len = time[0].length(), ans = 0;
-        int l = len - 1;
-        while(l >= 0) {
-            ans += (time[0].charAt(l) - '0') * Math.pow(10, len - 1 - l);
-            l--;
-        }
-        return ans;
-    }
-
     public Map<String, Integer> getMovieCountByGenre() {
         Map<String, Integer> ans = new HashMap<>();
         for (Movie m : movies) {
@@ -207,44 +216,29 @@ public class MovieAnalyzer {
 
     public List<String> getTopMovies(int top_k, String by) {
         List<String> ans = new ArrayList<>();
-        Map<String, Integer> ans_runtime = new HashMap<>();
-        Map<String, Integer> ans_overview = new HashMap<>();
-        if (by.equals("runtime")){
-            for (Movie m : movies) {
-                int run_time = getRunTime(m);
-                ans_runtime.put(m.Series_Title, run_time);
-            }
-            ans_runtime = ans_runtime
-                    .entrySet()
+        if (by.equals("runtime")) {
+            List<Movie> ans_runtime = movies
                     .stream()
-                    .sorted(comparingByKey())
-                    .sorted(Collections.reverseOrder(comparingByValue()))
-                    .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
+                    .sorted(Comparator.comparing(Movie::getRuntime, Comparator.reverseOrder()).thenComparing(Movie::getSeries_Title))
+                    .toList();
             int cnt = 0;
-            for (String name : ans_runtime.keySet()) {
-                name = name.replaceAll("\"", "");
+            for (Movie m : ans_runtime) {
                 if (cnt == top_k)
                     break;
-                ans.add(name);
+                ans.add(m.Series_Title);
                 cnt++;
             }
         }
         else if (by.equals("overview")) {
-            for(Movie m : movies) {
-                ans_overview.put(m.Series_Title, m.Overview.length());
-            }
-            ans_overview = ans_overview
-                    .entrySet()
+            List<Movie> ans_overview = movies
                     .stream()
-                    .sorted(comparingByKey())
-                    .sorted(Collections.reverseOrder(comparingByValue()))
-                    .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
+                    .sorted(Comparator.comparing(Movie::getLenOfOverview, Comparator.reverseOrder()).thenComparing(Movie::getSeries_Title))
+                    .toList();
             int cnt = 0;
-            for (String name : ans_overview.keySet()) {
-                name = name.replaceAll("\"", "");
+            for (Movie m : ans_overview) {
                 if (cnt == top_k)
                     break;
-                ans.add(name);
+                ans.add(m.Series_Title);
                 cnt++;
             }
         }
@@ -264,15 +258,15 @@ public class MovieAnalyzer {
     public static void main(String[] args) {
         MovieAnalyzer movieAnalyzer = new MovieAnalyzer("D:\\study\\G3\\Java2\\Assignment\\A1_Sample\\resources\\imdb_top_500.csv");
         for (Movie m : movies) {
-            if (m.Series_Title.equals("Drishyam")) {
+            if (m.Series_Title.equals("Metropolis") || m.Series_Title.equals("Indiana Jones and the Last Crusade") || m.Series_Title.equals("3 Idiots") || m.Series_Title.equals("Casino Royale")) {
                 System.out.println(m.Series_Title);
 //                System.out.println(m.Released_Year);
 //                System.out.println(m.Certificate);
-                System.out.println(m.Runtime);
+//                System.out.println(m.Runtime);
 //                System.out.println(m.Genre);
 //                System.out.println(m.IMDB_Rating);
-//                System.out.println(m.Overview);
-//                System.out.println(m.Overview.length());
+                System.out.println(m.Overview);
+                System.out.println(m.Overview.length());
 //                System.out.println(m.Meta_score);
 //                System.out.println(m.Director);
 //                System.out.println(m.Star1 + "->" + m.Star2 + "->" + m.Star3 + "->" + m.Star4);
