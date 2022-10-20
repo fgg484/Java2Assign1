@@ -93,6 +93,9 @@ public class MovieAnalyzer {
             if (this.Gross.charAt(0) != '\"') {
                 this.Gross = "NULL";
             }
+            else {
+                this.Gross = this.Gross.replaceAll("\"", "");
+            }
         }
 
         public int getRuntime() {
@@ -112,6 +115,35 @@ public class MovieAnalyzer {
 
         public int getLenOfOverview() {
             return this.Overview.length();
+        }
+
+        public float getRating() {
+            String[] s = this.IMDB_Rating.split("\\.");
+            float ans = s[0].charAt(0) - '0';
+            if (s.length != 1) {
+                ans += 0.1 * (s[1].charAt(0) - '0');
+            }
+            return ans;
+        }
+
+        public long getGross() {
+            if (this.Gross.equals("NULL")) {
+                return 0;
+            }
+            String[] s = this.Gross.split(",");
+            int len = s.length;
+            long ans = 0;
+            for (int i = len - 1; i >= 0; i--) {
+                int l = s[i].length();
+                long num = 0;
+                for (int j = l - 1; j >= 0; j--) {
+                    num += (s[i].charAt(j) - '0') * Math.pow(10, l - 1 - j);
+//                    System.out.println("num=" + num);
+                }
+                ans += num * Math.pow(1000, len - 1 - i);
+//                System.out.println("ans=" + ans);
+            }
+            return ans;
         }
     }
     public static List<Movie> movies = new ArrayList<>();
@@ -137,18 +169,7 @@ public class MovieAnalyzer {
         }
     }
     public Map<Integer, Integer> getMovieCountByYear() {
-//        int[] tong = new int[5000];
-//        for (Movie m : movies) {
-//            int year = getYear(m);
-//            tong[year]++;
-//        }
         Map<Integer, Integer> ans = new HashMap<>();
-//        for (int i = 1850; i <= 2025; i++) {
-//            if (tong[i] != 0) {
-//                ans.put(i, tong[i]);
-//                // System.out.println(i + " " + tong[i]);
-//            }
-//        }
         for (Movie m : movies) {
             int year = getYear(m);
             Integer cnt = ans.get(year);
@@ -246,8 +267,69 @@ public class MovieAnalyzer {
     }
 
     public List<String> getTopStars(int top_k, String by) {
-        List<String> ans = new ArrayList<>();
-        return ans;
+        List<String> stars = new ArrayList<>();
+        if (by.equals("rating")) {
+            Map<String, List<Float>> ans = new HashMap<>();
+            Map<String, Float> real_ans = new HashMap<>();
+            for (Movie m : movies) {
+                String[] s = {m.Star1, m.Star2, m.Star3, m.Star4};
+                for (String ss : s) {
+                    List<Float> num = ans.get(ss);
+                    if (num == null) {
+                        num = new ArrayList<>();
+                        num.add(m.getRating());
+                        num.add(1.0F);
+                        ans.put(ss, num);
+                        real_ans.put(ss, m.getRating());
+                    } else {
+                        num.set(0, num.get(0) + m.getRating());
+                        num.set(1, num.get(1) + 1);
+                        ans.put(ss, num);
+                        real_ans.put(ss, num.get(0) / num.get(1));
+                    }
+                }
+            }
+            stars = real_ans
+                    .entrySet()
+                    .stream()
+                    .sorted(comparingByKey())
+                    .sorted(Collections.reverseOrder(comparingByValue()))
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
+        }
+        else if (by.equals("gross")) {
+            Map<String, List<Long>> ans = new HashMap<>();
+            Map<String, Long> real_ans = new HashMap<>();
+            for (Movie m : movies) {
+                String[] s = {m.Star1, m.Star2, m.Star3, m.Star4};
+                for (String ss : s) {
+                    List<Long> num = ans.get(ss);
+                    if (num == null) {
+                        num = new ArrayList<>();
+                        num.add(m.getGross());
+                        num.add(1L);
+                        ans.put(ss, num);
+                        real_ans.put(ss, m.getGross());
+                    } else {
+                        num.set(0, num.get(0) + m.getGross());
+                        if (m.getGross() == 0)
+                            num.set(1, num.get(1));
+                        else
+                            num.set(1, num.get(1) + 1);
+                        ans.put(ss, num);
+                        real_ans.put(ss, num.get(0) / num.get(1));
+                    }
+                }
+            }
+            stars = real_ans
+                    .entrySet()
+                    .stream()
+                    .sorted(comparingByKey())
+                    .sorted(Collections.reverseOrder(comparingByValue()))
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
+        }
+        return stars.subList(0, top_k);
     }
 
     public List<String> searchMovies(String genre, float min_rating, int max_runtime) {
@@ -257,23 +339,28 @@ public class MovieAnalyzer {
 
     public static void main(String[] args) {
         MovieAnalyzer movieAnalyzer = new MovieAnalyzer("D:\\study\\G3\\Java2\\Assignment\\A1_Sample\\resources\\imdb_top_500.csv");
-        for (Movie m : movies) {
-            if (m.Series_Title.equals("Metropolis") || m.Series_Title.equals("Indiana Jones and the Last Crusade") || m.Series_Title.equals("3 Idiots") || m.Series_Title.equals("Casino Royale")) {
-                System.out.println(m.Series_Title);
-//                System.out.println(m.Released_Year);
-//                System.out.println(m.Certificate);
-//                System.out.println(m.Runtime);
-//                System.out.println(m.Genre);
-//                System.out.println(m.IMDB_Rating);
-                System.out.println(m.Overview);
-                System.out.println(m.Overview.length());
-//                System.out.println(m.Meta_score);
-//                System.out.println(m.Director);
-//                System.out.println(m.Star1 + "->" + m.Star2 + "->" + m.Star3 + "->" + m.Star4);
-//                System.out.println(m.Noofvotes);
-//                System.out.println(m.Gross);
-            }
-        }
-        // System.out.println(getTopMovies(10, "runtime"));
+        //List<String> list = getTopStars(50,"rating");
+        //for(String s : list) {
+            //System.out.println(s);
+            for (Movie m : movies) {
+                //if (m.Star1.equals(s) || m.Star2.equals(s) || m.Star3.equals(s) || m.Star4.equals(s)) {
+//                    System.out.println(m.Series_Title);
+//                    System.out.println(m.Released_Year);
+//                    System.out.println(m.Certificate);
+//                    System.out.println(m.Runtime);
+//                    System.out.println(m.Genre);
+//                    System.out.println(m.IMDB_Rating);
+//                    System.out.println(m.getRating());
+//                    System.out.println(m.Overview);
+//                    System.out.println(m.Overview.length());
+//                    System.out.println(m.Meta_score);
+//                    System.out.println(m.Director);
+//                    System.out.println(m.Star1 + "->" + m.Star2 + "->" + m.Star3 + "->" + m.Star4);
+//                    System.out.println(m.Noofvotes);
+                    System.out.println(m.Gross);
+                    System.out.println(m.getGross());
+                }
+            //}
+        //}
     }
 }
