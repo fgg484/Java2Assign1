@@ -1,8 +1,5 @@
 import javax.lang.model.element.Element;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -159,14 +156,14 @@ public class MovieAnalyzer {
         }
     }
     public static List<Movie> movies = new ArrayList<>();
-    public MovieAnalyzer(String dataset_path) {
+    public MovieAnalyzer(String dataset_path) throws FileNotFoundException, UnsupportedEncodingException {
         File file = new File(dataset_path);
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+        FileInputStream fileInputStream = new FileInputStream(file);
+        InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
+        try (BufferedReader reader = new BufferedReader(inputStreamReader)) {
             String tempString;
             int line = 0;
-            // 一次读入一行，直到读入null为文件结束
             while ((tempString = reader.readLine()) != null) {
-                // 显示行号
                 // System.out.println("line " + line + ": " + tempString);
                 // System.out.println();
                 Movie movie = new Movie(tempString);
@@ -193,7 +190,6 @@ public class MovieAnalyzer {
             }
         }
         //System.out.println(ans);
-//        转化为list的方式
 //        List<Map.Entry<Integer, Integer>> list = new ArrayList<Map.Entry<Integer, Integer>>(ans.entrySet());
 //        list.sort(new Comparator<Map.Entry<Integer, Integer>>() {
 //          public int compare(Map.Entry<Integer, Integer> o1, Map.Entry<Integer, Integer> o2) {
@@ -400,31 +396,31 @@ public class MovieAnalyzer {
                 .sorted(String::compareTo)
                 .toList();
     }
-
-    public static void main(String[] args) {
-        MovieAnalyzer movieAnalyzer = new MovieAnalyzer("D:\\study\\G3\\Java2\\Assignment\\A1_Sample\\resources\\imdb_top_500.csv");
-//        System.out.println(getCoStarCount().entrySet().stream()
-//                .sorted(Collections.reverseOrder(comparingByValue()))
-//                .collect(Collectors.toList()));
-            for (Movie m : movies) {
-                String s = "511";
-                if (m.Star1.equals(s) || m.Star2.equals(s) || m.Star3.equals(s) || m.Star4.equals(s)) {
-                    System.out.println(m.Series_Title);
-                    System.out.println(m.Released_Year);
-                    System.out.println(m.Certificate);
-                    System.out.println(m.Runtime);
-                    System.out.println(m.Genre);
-                    System.out.println(m.IMDB_Rating);
-                    System.out.println(m.getRating());
-                    System.out.println(m.Overview);
-                    System.out.println(m.Overview.length());
-                    System.out.println(m.Meta_score);
-                    System.out.println(m.Director);
-                    System.out.println(m.Star1 + "->" + m.Star2 + "->" + m.Star3 + "->" + m.Star4);
-                    System.out.println(m.Noofvotes);
-                    System.out.println(m.Gross);
-                    System.out.println(m.getGross());
-                }
-        }
-    }
+//
+//    public static void main(String[] args) {
+//        MovieAnalyzer movieAnalyzer = new MovieAnalyzer("D:\\study\\G3\\Java2\\Assignment\\A1_Sample\\resources\\imdb_top_500.csv");
+////        System.out.println(getCoStarCount().entrySet().stream()
+////                .sorted(Collections.reverseOrder(comparingByValue()))
+////                .collect(Collectors.toList()));
+//            for (Movie m : movies) {
+//                String s = "511";
+//                if (m.Star1.equals(s) || m.Star2.equals(s) || m.Star3.equals(s) || m.Star4.equals(s)) {
+//                    System.out.println(m.Series_Title);
+//                    System.out.println(m.Released_Year);
+//                    System.out.println(m.Certificate);
+//                    System.out.println(m.Runtime);
+//                    System.out.println(m.Genre);
+//                    System.out.println(m.IMDB_Rating);
+//                    System.out.println(m.getRating());
+//                    System.out.println(m.Overview);
+//                    System.out.println(m.Overview.length());
+//                    System.out.println(m.Meta_score);
+//                    System.out.println(m.Director);
+//                    System.out.println(m.Star1 + "->" + m.Star2 + "->" + m.Star3 + "->" + m.Star4);
+//                    System.out.println(m.Noofvotes);
+//                    System.out.println(m.Gross);
+//                    System.out.println(m.getGross());
+//                }
+//        }
+//    }
 }
