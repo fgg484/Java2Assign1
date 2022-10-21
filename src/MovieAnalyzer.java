@@ -26,36 +26,42 @@ public class MovieAnalyzer {
         String Noofvotes;// Total number of votes
         String Gross;// Money earned by that movie
 
-        //"https://m.media-amazon.com/images/M/MV5BOTc2ZTlmYmItMDBhYS00YmMzLWI4ZjAtMTI5YTBjOTFiMGEwXkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_UY98_CR0,0,67,98_AL_.jpg",
-        // Soorarai Pottru,
-        // 2020,
-        // U,
-        // 153 min,
-        // Drama,
-        // 8.6,
-        // "Nedumaaran Rajangam ""Maara"" sets out to make the common man fly and in the process takes on the world's most capital intensive industry and several enemies who stand in his way.",
-        // ,
-        // Sudha Kongara,
-        // Suriya,
-        // Madhavan,
-        // Paresh Rawal,
-        // Aparna Balamurali,
-        // 54995,
-        //
+        //V for Vendetta,
+        // 2005,
+        // A,
+        // 132 min,
+        // "Action, Drama, Sci-Fi",
+        // 8.2,
+        // "In a future British tyranny,
+        // a shadowy freedom fighter,
+        // known only by the alias of ""V"",
+        // plots to overthrow it with the help of a young woman.",
+        // 62,
+        // James McTeigue,
+        // Hugo Weaving,
+        // Natalie Portman,
+        // Rupert Graves,
+        // Stephen Rea,
+        // 1032749,
+        // "70,511,035"
 
         public Movie(String movie) {
             String[] s = movie.split(",");
             int flag = 0, index = 0;
             String now = "";
             for (String ss : s) {
+                int is_null = 0;
                 if (ss == null || ss.length() == 0) {
                     now = "NULL";
+                    is_null = 1;
                 }
-                else if (ss.charAt(0) == '\"' || ss.charAt(ss.length() - 1) == '\"') {
-                    if (!(ss.charAt(0) == '\"' && ss.charAt(ss.length() - 1) == '\"')) {
-                        flag++;
-                        flag %= 2;
+                if (is_null == 0) {
+                    for (int i = 0; i < ss.length(); i++) {
+                        if (ss.charAt(i) == '\"') {
+                            flag++;
+                        }
                     }
+                    flag %= 2;
                 }
                 now += ss;
                 if (flag == 0) {
@@ -87,9 +93,13 @@ public class MovieAnalyzer {
             if (this.Series_Title.charAt(0) == '\"') {
                 this.Series_Title = this.Series_Title.substring(1, this.Series_Title.length() - 1);
             }
-            if (this.Overview.charAt(0) == '\"') {
+            if (this.Overview.charAt(0) == '\"' && this.Overview.charAt(this.getLenOfOverview() - 1) == '\"') {
                 this.Overview = this.Overview.substring(1, this.Overview.length() - 1);
             }
+//            this.Star1 = this.Star1.replaceAll("\"", "");
+//            this.Star2 = this.Star2.replaceAll("\"", "");
+//            this.Star3 = this.Star3.replaceAll("\"", "");
+//            this.Star4 = this.Star4.replaceAll("\"", "");
             this.Genre = this.Genre.replaceAll("\"", "");
             this.Genre = this.Genre.replaceAll(" ","");
             if (this.Gross.charAt(0) != '\"') {
@@ -233,7 +243,24 @@ public class MovieAnalyzer {
 
     public Map<List<String>, Integer> getCoStarCount() {
         Map<List<String>, Integer> ans = new HashMap<>();
-
+        for (Movie m : movies) {
+            String[] stars = {m.Star1, m.Star2, m.Star3, m.Star4};
+            for (int i = 0; i < 3; i++) {
+                for (int j = i + 1; j <= 3; j++) {
+                    List<String> list = new ArrayList<>();
+                    list.add(stars[i]);
+                    list.add(stars[j]);
+                    list.sort(String::compareTo);
+                    Integer cnt = ans.get(list);
+                    if (cnt == null) {
+                        ans.put(list, 1);
+                    }
+                    else {
+                        ans.put(list, cnt + 1);
+                    }
+                }
+            }
+        }
         return ans;
     }
 
@@ -376,29 +403,28 @@ public class MovieAnalyzer {
 
     public static void main(String[] args) {
         MovieAnalyzer movieAnalyzer = new MovieAnalyzer("D:\\study\\G3\\Java2\\Assignment\\A1_Sample\\resources\\imdb_top_500.csv");
-        //List<String> list = getTopStars(50,"rating");
-        //for(String s : list) {
-            //System.out.println(s);
+//        System.out.println(getCoStarCount().entrySet().stream()
+//                .sorted(Collections.reverseOrder(comparingByValue()))
+//                .collect(Collectors.toList()));
             for (Movie m : movies) {
-                String s = "Toni Collette";
+                String s = "511";
                 if (m.Star1.equals(s) || m.Star2.equals(s) || m.Star3.equals(s) || m.Star4.equals(s)) {
-//                    System.out.println(m.Series_Title);
-//                    System.out.println(m.Released_Year);
-//                    System.out.println(m.Certificate);
-//                    System.out.println(m.Runtime);
-//                    System.out.println(m.Genre);
-//                    System.out.println(m.IMDB_Rating);
-//                    System.out.println(m.getRating());
-//                    System.out.println(m.Overview);
-//                    System.out.println(m.Overview.length());
-//                    System.out.println(m.Meta_score);
-//                    System.out.println(m.Director);
-//                    System.out.println(m.Star1 + "->" + m.Star2 + "->" + m.Star3 + "->" + m.Star4);
-//                    System.out.println(m.Noofvotes);
+                    System.out.println(m.Series_Title);
+                    System.out.println(m.Released_Year);
+                    System.out.println(m.Certificate);
+                    System.out.println(m.Runtime);
+                    System.out.println(m.Genre);
+                    System.out.println(m.IMDB_Rating);
+                    System.out.println(m.getRating());
+                    System.out.println(m.Overview);
+                    System.out.println(m.Overview.length());
+                    System.out.println(m.Meta_score);
+                    System.out.println(m.Director);
+                    System.out.println(m.Star1 + "->" + m.Star2 + "->" + m.Star3 + "->" + m.Star4);
+                    System.out.println(m.Noofvotes);
                     System.out.println(m.Gross);
                     System.out.println(m.getGross());
                 }
-            //}
         }
     }
 }
