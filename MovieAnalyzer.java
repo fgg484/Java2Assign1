@@ -9,37 +9,18 @@ import static java.util.stream.Collectors.toMap;
 public class MovieAnalyzer {
     public class Movie {
         String Poster_Link;
-        String Series_Title;// Name of the movie
-        String Released_Year;// Year at which that movie released
-        String Certificate;// Certificate earned by that movie
-        String Runtime;// Total runtime of the movie
-        String Genre;// Genre of the movie
-        String IMDB_Rating;// Rating of the movie at IMDB site
-        String Overview;// mini story/ summary
-        String Meta_score;// Score earned by the movie
-        String Director;// Name of the Director
-        String Star1, Star2, Star3, Star4;// Name of the Stars
-        String Noofvotes;// Total number of votes
-        String Gross;// Money earned by that movie
-
-        //V for Vendetta,
-        // 2005,
-        // A,
-        // 132 min,
-        // "Action, Drama, Sci-Fi",
-        // 8.2,
-        // "In a future British tyranny,
-        // a shadowy freedom fighter,
-        // known only by the alias of ""V"",
-        // plots to overthrow it with the help of a young woman.",
-        // 62,
-        // James McTeigue,
-        // Hugo Weaving,
-        // Natalie Portman,
-        // Rupert Graves,
-        // Stephen Rea,
-        // 1032749,
-        // "70,511,035"
+        String Series_Title;
+        String Released_Year;
+        String Certificate;
+        String Runtime;
+        String Genre;
+        String IMDB_Rating;
+        String Overview;
+        String Meta_score;
+        String Director;
+        String Star1, Star2, Star3, Star4;
+        String Noofvotes;
+        String Gross;
 
         public Movie(String movie) {
             String[] s = movie.split(",");
