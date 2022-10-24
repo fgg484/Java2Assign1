@@ -1,4 +1,3 @@
-import javax.lang.model.element.Element;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -10,18 +9,18 @@ import static java.util.stream.Collectors.toMap;
 public class MovieAnalyzer {
     public class Movie {
         String Poster_Link;
-        String Series_Title;// Name of the movie
-        String Released_Year;// Year at which that movie released
-        String Certificate;// Certificate earned by that movie
-        String Runtime;// Total runtime of the movie
-        String Genre;// Genre of the movie
-        String IMDB_Rating;// Rating of the movie at IMDB site
-        String Overview;// mini story/ summary
-        String Meta_score;// Score earned by the movie
-        String Director;// Name of the Director
-        String Star1, Star2, Star3, Star4;// Name of the Stars
-        String Noofvotes;// Total number of votes
-        String Gross;// Money earned by that movie
+        String Series_Title; // Name of the movie
+        String Released_Year; // Year at which that movie released
+        String Certificate; // Certificate earned by that movie
+        String Runtime; // Total runtime of the movie
+        String Genre; // Genre of the movie
+        String IMDB_Rating; // Rating of the movie at IMDB site
+        String Overview; // mini story/ summary
+        String Meta_score; // Score earned by the movie
+        String Director; // Name of the Director
+        String Star1, Star2, Star3, Star4; // Name of the Stars
+        String Noofvotes; // Total number of votes
+        String Gross; // Money earned by that movie
 
         //V for Vendetta,
         // 2005,
